@@ -1,0 +1,96 @@
+1) Selecting table to view the data 
+
+Select * From clubmember 
+
+2) Creating temp table in order to clean the table: 
+
+Create table CCLUBMEMBER( 
+FULL_NAME NVARCHAR(50) NOT NULL, 
+AGE SMALLINT NULL, 
+MARTIAL_STATUS NVARCHAR(50) NULL, 
+EMAIL NVARCHAR(50) NOT NULL, 
+PHONE NVARCHAR(50) NULL, 
+FULL_ADDRESS NVARCHAR(100) NOT NULL, 
+JOB_TITLE NVARCHAR(50) NULL, 
+MEMBERSHIP_DATE DATE NOT NULL 
+
+3)Inserting Data from original file to temp file: 
+
+INSERT INTO Cclubmember 
+SELECT * FROM clubmember; 
+
+4)Counting Number of records in new table 
+
+Select Count(*) As record_count 
+From Cclubmember 
+
+5) Finding Duplicate email address: 
+Select Email, Count(*) 
+From CCLUBMEMBER 
+Group By Email 
+Having Count(*)>1 
+
+ 
+
+6) Deleting Duplicates 
+WITH DUPLICATE AS 
+( 
+Select *, 
+ROW_NUMBER() OVER(PARTITION BY EMAIL ORDER BY EMAIL) AS RN 
+fROM Cclubmember 
+) 
+Delete From DUPLICATE 
+WHERE RN>1 
+
+7)Let's check again the count after deleting the duplicates: 
+
+Select count(*) 
+From Cclubmember
+
+8)Finding count of Nulls from each column: 
+
+Select Count(*) Totalrows, 
+Count(*)-Count(Full_Name) As Fullnamenull, 
+Count(*)-Count(Age) As AgeNull, 
+Count(*)-Count(Martial_status) As Martialstatusnull,  
+Count(*)-Count(Email) As EmailNull, 
+Count(*)-Count(Phone) As PhoneNull, 
+Count(*)-Count(Full_Address) As FullAddressNull, 
+Count(*)-Count(Job_title) As JobtitleNull, 
+Count(*)-Count(Membership_date) As MembershipdateNull 
+From CCLUBMEMBER 
+
+8)Trying to find if we can find replacement for Null value. For that we will use Join. The following query is for Martial_Status column: 
+
+Select C1.Full_Name, C1.Martial_status, 
+C2.Full_Name, C2.Martial_status 
+From CCLUBMEMBER C1 
+Inner Join CCLUBMEMBER C2 
+ON 
+C1.Full_Name=C2.Full_Name 
+Where C1.Martial_status IS NULL AND C2.Martial_status IS NOT NULL 
+
+ 
+Similarly for Job_Title: 
+
+Select C1.Full_Name, C1.job_title, 
+C2.Full_Name, C2.job_title 
+From CCLUBMEMBER C1 
+Inner Join CCLUBMEMBER C2 
+ON 
+C1.Full_Name=C2.Full_Name 
+Where C1.job_title IS NULL AND C2.job_title IS NOT NULL 
+
+ 
+9) In order to find Distinct values from the column. 
+
+Select Distinct Martial_status 
+From CCLUBMEMBER 
+
+10) In Martial_status I found a spelling mistake. Following is the query to update the mistake: 
+
+Update CCLUBMEMBER 
+Set MARTIAL_STATUS= 'divorced' 
+Where MARTIAL_STATUS= 'divored' 
+
+ 
